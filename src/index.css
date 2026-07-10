@@ -1,0 +1,75 @@
+@import "tailwindcss";
+
+body {
+  margin: 0;
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  background: #0a0e1a;
+  color: #e2e8f0;
+  overflow: hidden;
+  height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Monospace accent — score labels, codes, coordinates */
+.font-mono {
+  font-family: 'Space Mono', monospace;
+  letter-spacing: -0.02em;
+}
+
+/* Tighter tracking for uppercase labels */
+.label-caps {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.65rem;
+}
+
+#root {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.map-container {
+  background: radial-gradient(ellipse at center, #0d1b2e 0%, #0a0e1a 100%);
+}
+
+.country-path {
+  cursor: pointer;
+  transition: fill 0.12s ease;
+  stroke: none;
+}
+
+.country-path:hover {
+  filter: brightness(1.35);
+}
+
+.country-path.selected {
+  stroke: rgba(96, 165, 250, 0.9);
+  stroke-width: 1.2;
+  vector-effect: non-scaling-stroke;
+  -webkit-vector-effect: non-scaling-stroke;
+  filter: brightness(1.4);
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 3px;
+}
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #2d4a7a;
+  border-radius: 2px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fadeIn 0.2s ease forwards;
+}
