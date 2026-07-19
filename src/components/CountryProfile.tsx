@@ -253,7 +253,7 @@ export default function CountryProfile({ countryId, mode, timelineYear, highligh
                 )}
               </div>
               {religionInfo.mixed && (
-                <div className="text-xs mb-1" style={{ color: '#a855f7' }}>No single religious majority</div>
+                <div className="text-xs mb-1" style={{ color: '#60a5fa' }}>No single religious majority</div>
               )}
               <div className="text-xs leading-relaxed" style={{ color: '#94a3b8' }}>
                 {religionLines(religionInfo.breakdown).map((line, i) => <div key={i}>{line}</div>)}

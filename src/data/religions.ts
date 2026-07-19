@@ -36,19 +36,23 @@ export const RELIGION_ORDER: ReligionCategory[] = [
   'hinduism', 'buddhism', 'judaism', 'folk', 'nonreligious',
 ];
 
+// Colors are grouped by family so related branches read as visually related:
+// Christianity = blue family (dark Catholic -> light Protestant, Orthodox/other as
+// nearby blue-violet/blue-gray tones); Islam = warm family (orange Sunni -> yellow
+// Shia, rust for mixed/other sects). Everything else gets its own distinct hue.
 export const RELIGION_META: Record<ReligionCategory, { label: string; color: string }> = {
-  catholic:            { label: 'Catholic',                    color: '#3b82f6' },
-  protestant:          { label: 'Protestant',                  color: '#16a34a' },
-  orthodox:            { label: 'Orthodox Christian',          color: '#6366f1' },
-  christianity_other:  { label: 'Christianity (mixed/other)',  color: '#14b8a6' },
-  sunni:               { label: 'Sunni Islam',                 color: '#84cc16' },
-  shia:                { label: 'Shia Islam',                  color: '#a855f7' },
-  islam_mixed:         { label: 'Islam (mixed/other)',         color: '#06b6d4' },
-  hinduism:            { label: 'Hinduism',                    color: '#f97316' },
-  buddhism:            { label: 'Buddhism',                    color: '#eab308' },
-  judaism:             { label: 'Judaism',                     color: '#ec4899' },
-  folk:                { label: 'Folk / Traditional',          color: '#92400e' },
-  nonreligious:        { label: 'Non-religious',                color: '#64748b' },
+  catholic:            { label: 'Catholic',                    color: '#1d4ed8' }, // dark blue
+  protestant:          { label: 'Protestant',                  color: '#7dd3fc' }, // light blue
+  orthodox:            { label: 'Orthodox Christian',          color: '#6366f1' }, // indigo (third Christian tone)
+  christianity_other:  { label: 'Christianity (mixed/other)',  color: '#94a3b8' }, // pale blue-gray
+  sunni:               { label: 'Sunni Islam',                 color: '#f97316' }, // orange
+  shia:                { label: 'Shia Islam',                  color: '#facc15' }, // yellow
+  islam_mixed:         { label: 'Islam (mixed/other)',         color: '#c2410c' }, // rust (third Islam tone)
+  hinduism:            { label: 'Hinduism',                    color: '#ec4899' }, // pink/magenta
+  buddhism:            { label: 'Buddhism',                    color: '#22c55e' }, // green
+  judaism:             { label: 'Judaism',                     color: '#a855f7' }, // purple
+  folk:                { label: 'Folk / Traditional',          color: '#78350f' }, // dark brown
+  nonreligious:        { label: 'Non-religious',                color: '#78716c' }, // warm gray
 };
 
 export const RELIGIONS: Record<string, ReligionInfo> = {
@@ -56,7 +60,7 @@ export const RELIGIONS: Record<string, ReligionInfo> = {
   DZA: { majority: 'sunni', majorityPct: 97, breakdown: 'Sunni Islam ~97%, other/none ~3%' },
   AGO: { majority: 'catholic', majorityPct: 90, breakdown: 'Catholic ~41%, Protestant ~38%, other ~11%, none ~10%' },
   BEN: { majority: 'catholic', majorityPct: 48, mixed: true, secondary: 'sunni', breakdown: 'Christian (Catholic plurality) ~48%, Sunni Islam ~28%, Vodun/folk ~12%' },
-  BWA: { majority: 'protestant', majorityPct: 79, breakdown: 'Christian ~79%, folk/traditional ~15%, none ~5%' },
+  BWA: { majority: 'protestant', majorityPct: 79, breakdown: 'Protestant ~79%, folk/traditional ~15%, none ~5%' },
   BFA: { majority: 'sunni', majorityPct: 61, breakdown: 'Sunni Islam ~61%, Christian ~26%, folk/traditional ~15%' },
   BDI: { majority: 'catholic', majorityPct: 93, breakdown: 'Catholic ~62%, Protestant ~25%, other ~13%' },
   CMR: { majority: 'catholic', majorityPct: 63, breakdown: 'Christian (Catholic plurality) ~63%, Sunni Islam ~24%, folk/traditional ~13%' },
@@ -73,23 +77,23 @@ export const RELIGIONS: Record<string, ReligionInfo> = {
   ERI: { majority: 'orthodox', majorityPct: 50, mixed: true, secondary: 'sunni', breakdown: 'Eritrean Orthodox ~50%, Sunni Islam ~48% — near-even split' },
   SWZ: { majority: 'christianity_other', majorityPct: 90, breakdown: 'Christian ~90% (Zionist syncretic majority), folk minority' },
   ETH: { majority: 'orthodox', majorityPct: 44, mixed: true, secondary: 'sunni', breakdown: 'Ethiopian Orthodox ~44% (plurality), Sunni Islam ~34%, Protestant ~19%' },
-  GAB: { majority: 'catholic', majorityPct: 80, breakdown: 'Christian ~80%, Sunni Islam ~10%, folk ~10%' },
+  GAB: { majority: 'catholic', majorityPct: 80, breakdown: 'Catholic ~80%, Sunni Islam ~10%, folk ~10%' },
   GMB: { majority: 'sunni', majorityPct: 96, breakdown: 'Sunni Islam ~96%, Christian ~4%' },
-  GHA: { majority: 'protestant', majorityPct: 71, breakdown: 'Christian ~71%, Sunni Islam ~18%, folk ~5%' },
+  GHA: { majority: 'protestant', majorityPct: 71, breakdown: 'Protestant ~71%, Sunni Islam ~18%, folk ~5%' },
   GIN: { majority: 'sunni', majorityPct: 85, breakdown: 'Sunni Islam ~85%, Christian ~8%, folk ~7%' },
   GNB: { majority: 'sunni', majorityPct: 46, mixed: true, secondary: 'folk', breakdown: 'Sunni Islam ~46% (plurality), folk/traditional ~30%, Christian ~19%' },
   KEN: { majority: 'christianity_other', majorityPct: 85, breakdown: 'Christian ~85% (fragmented Catholic/Protestant), Sunni Islam ~11%, folk ~2%' },
   LSO: { majority: 'catholic', majorityPct: 90, breakdown: 'Christian ~90% (Catholic plurality), folk minority' },
-  LBR: { majority: 'protestant', majorityPct: 85, breakdown: 'Christian ~85%, Sunni Islam ~12%, folk minority' },
+  LBR: { majority: 'protestant', majorityPct: 85, breakdown: 'Protestant ~85%, Sunni Islam ~12%, folk minority' },
   LBY: { majority: 'sunni', majorityPct: 97, breakdown: 'Sunni Islam ~97% (state religion)' },
-  MDG: { majority: 'catholic', majorityPct: 85, breakdown: 'Christian ~85% (heavy folk syncretism), Sunni Islam ~7%' },
-  MWI: { majority: 'protestant', majorityPct: 77, breakdown: 'Christian ~77%, Sunni Islam ~14%, folk minority' },
+  MDG: { majority: 'catholic', majorityPct: 85, breakdown: 'Catholic ~85% (heavy folk syncretism), Sunni Islam ~7%' },
+  MWI: { majority: 'protestant', majorityPct: 77, breakdown: 'Protestant ~77%, Sunni Islam ~14%, folk minority' },
   MLI: { majority: 'sunni', majorityPct: 93, breakdown: 'Sunni Islam ~93%, Christian/folk ~7%' },
   MRT: { majority: 'sunni', majorityPct: 100, breakdown: 'Sunni Islam ~100% (state religion)' },
   MUS: { majority: 'hinduism', majorityPct: 48, mixed: true, secondary: 'catholic', breakdown: 'Hindu ~48% (plurality), Christian (Catholic) ~32%, Sunni Islam ~17%' },
   MAR: { majority: 'sunni', majorityPct: 99, breakdown: 'Sunni Islam ~99% (state religion)' },
   MOZ: { majority: 'catholic', majorityPct: 57, breakdown: 'Christian (Catholic plurality) ~57%, Sunni Islam ~19%, folk/traditional ~24%' },
-  NAM: { majority: 'protestant', majorityPct: 90, breakdown: 'Christian ~90% (Lutheran plurality), folk minority' },
+  NAM: { majority: 'protestant', majorityPct: 90, breakdown: 'Protestant ~90% (Lutheran plurality), folk minority' },
   NER: { majority: 'sunni', majorityPct: 99, breakdown: 'Sunni Islam ~99%' },
   NGA: { majority: 'christianity_other', majorityPct: 49, mixed: true, secondary: 'sunni', breakdown: 'Christian (fragmented Catholic/Protestant/Pentecostal) ~49%, Sunni Islam ~48% — near-even north/south split' },
   RWA: { majority: 'catholic', majorityPct: 93, breakdown: 'Catholic ~44%, Protestant ~38%, other Christian ~11%' },
@@ -98,7 +102,7 @@ export const RELIGIONS: Record<string, ReligionInfo> = {
   SYC: { majority: 'catholic', majorityPct: 94, breakdown: 'Catholic ~76%, Protestant/other Christian ~18%' },
   SLE: { majority: 'sunni', majorityPct: 78, breakdown: 'Sunni Islam ~78%, Christian ~21%' },
   SOM: { majority: 'sunni', majorityPct: 99, breakdown: 'Sunni Islam ~99% (state religion)' },
-  ZAF: { majority: 'protestant', majorityPct: 86, breakdown: 'Christian ~86%, none ~9%, other ~5%' },
+  ZAF: { majority: 'protestant', majorityPct: 86, breakdown: 'Protestant ~86%, none ~9%, other ~5%' },
   SSD: { majority: 'christianity_other', majorityPct: 60, breakdown: 'Christian (Catholic/Anglican split) ~60%, folk/traditional ~33%, Sunni Islam ~6%' },
   SDN: { majority: 'sunni', majorityPct: 97, breakdown: 'Sunni Islam ~97%, Christian/folk ~3%' },
   TZA: { majority: 'christianity_other', majorityPct: 63, breakdown: 'Christian ~63% (fragmented Catholic/Protestant), Sunni Islam ~34%' },
@@ -106,8 +110,8 @@ export const RELIGIONS: Record<string, ReligionInfo> = {
   TUN: { majority: 'sunni', majorityPct: 99, breakdown: 'Sunni Islam ~99% (state religion)' },
   UGA: { majority: 'christianity_other', majorityPct: 84, breakdown: 'Christian ~84% (Catholic/Anglican split), Sunni Islam ~14%' },
   ESH: { majority: 'sunni', majorityPct: 100, breakdown: 'Sunni Islam ~100%' },
-  ZMB: { majority: 'protestant', majorityPct: 95, breakdown: 'Christian ~95% (constitutionally Christian nation)' },
-  ZWE: { majority: 'protestant', majorityPct: 84, breakdown: 'Christian ~84% (heavy folk syncretism), folk minority' },
+  ZMB: { majority: 'protestant', majorityPct: 95, breakdown: 'Protestant ~95% (constitutionally Christian nation)' },
+  ZWE: { majority: 'protestant', majorityPct: 84, breakdown: 'Protestant ~84% (heavy folk syncretism), folk minority' },
 
   // ── Americas ──────────────────────────────────────────────
   ATG: { majority: 'protestant', majorityPct: 90, breakdown: 'Protestant/Anglican majority, Catholic minority' },
@@ -121,7 +125,7 @@ export const RELIGIONS: Record<string, ReligionInfo> = {
   CHL: { majority: 'catholic', majorityPct: 62, breakdown: 'Catholic ~42%, Evangelical/Protestant ~20%, none ~35%' },
   COL: { majority: 'catholic', majorityPct: 90, breakdown: 'Catholic ~73%, Protestant/Evangelical ~17%' },
   CRI: { majority: 'catholic', majorityPct: 90, breakdown: 'Catholic ~52%, Evangelical/Protestant ~25%' },
-  CUB: { majority: 'catholic', majorityPct: 59, breakdown: 'Christian ~59% (heavy Santería/folk syncretism), unaffiliated ~23%' },
+  CUB: { majority: 'catholic', majorityPct: 59, breakdown: 'Catholic ~59% (heavy Santería/folk syncretism), unaffiliated ~23%' },
   DMA: { majority: 'catholic', majorityPct: 90, breakdown: 'Catholic majority, Protestant minority' },
   DOM: { majority: 'catholic', majorityPct: 92, breakdown: 'Catholic ~57%, Protestant/Evangelical ~30%' },
   ECU: { majority: 'catholic', majorityPct: 92, breakdown: 'Catholic ~74%, Protestant/Evangelical ~13%' },
@@ -280,7 +284,7 @@ export const RELIGIONS: Record<string, ReligionInfo> = {
   MNP: { majority: 'catholic', majorityPct: 85, breakdown: 'Catholic majority' },
   COK: { majority: 'protestant', majorityPct: 90, breakdown: 'Cook Islands Christian Church majority' },
   TCA: { majority: 'protestant', majorityPct: 85, breakdown: 'Protestant/Baptist majority' },
-  SXM: { majority: 'catholic', majorityPct: 85, breakdown: 'Christian majority (Dutch territory)' },
+  SXM: { majority: 'catholic', majorityPct: 85, breakdown: 'Catholic majority (Dutch territory)' },
   MSR: { majority: 'catholic', majorityPct: 85, breakdown: 'Catholic majority (Irish heritage), Anglican/Methodist minority' },
   BMU: { majority: 'protestant', majorityPct: 80, breakdown: 'Anglican/Christian majority' },
   ASM: { majority: 'protestant', majorityPct: 90, breakdown: 'Congregationalist/Christian majority' },

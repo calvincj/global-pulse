@@ -598,7 +598,7 @@ export default function WorldMap({ selectedCountry, secondaryCountry, onSelectCo
                   Majority Religion
                 </div>
                 {religionFilter && (
-                  <button onClick={() => setReligionFilter(null)} className="text-xs" style={{ color: '#a855f7' }} title="Clear filter">Clear ✕</button>
+                  <button onClick={() => setReligionFilter(null)} className="text-xs" style={{ color: '#60a5fa' }} title="Clear filter">Clear ✕</button>
                 )}
               </div>
               <div className="grid grid-cols-2 gap-x-3 gap-y-1">
@@ -620,7 +620,7 @@ export default function WorldMap({ selectedCountry, secondaryCountry, onSelectCo
                 })}
               </div>
               <div className="flex items-center gap-1.5 text-xs mt-2 pt-2" style={{ color: '#4b5563', borderTop: '1px solid #162030' }}>
-                <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: 'repeating-linear-gradient(45deg, #a855f7 0, #a855f7 2px, #84cc16 2px, #84cc16 4px)' }} />
+                <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: 'repeating-linear-gradient(45deg, #f97316 0, #f97316 2px, #facc15 2px, #facc15 4px)' }} />
                 <span>Striped = no single majority</span>
               </div>
               <div className="text-xs mt-1" style={{ color: '#374151' }}>Click a religion to isolate it</div>
