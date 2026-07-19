@@ -55,6 +55,7 @@ export interface MapTooltip {
   name: string;
   polScore?: number;
   ecoScore?: number;
+  note?: string;
 }
 
 export type MapMode = 'political' | 'economic';

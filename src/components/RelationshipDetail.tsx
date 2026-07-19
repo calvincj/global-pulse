@@ -9,7 +9,11 @@ import { getHistoricalRelationship, interpolateSnapshot } from '../data/historic
 import ScoreBar from './ScoreBar';
 import type { MapMode } from '../types';
 
-interface Props { countryA: string; countryB: string; mode: MapMode; timelineYear?: number | null }
+interface Props {
+  countryA: string; countryB: string; mode: MapMode; timelineYear?: number | null;
+  highlightedBloc?: string | null;
+  onHighlightBloc?: (key: string) => void;
+}
 
 const fmt$ = (n: number) =>
   n >= 1e12 ? `$${(n/1e12).toFixed(2)}T`
@@ -57,7 +61,7 @@ function CompareRow({ label, a, b, fmtFn, higherIsNotable = true }: {
   );
 }
 
-export default function RelationshipDetail({ countryA, countryB, mode, timelineYear }: Props) {
+export default function RelationshipDetail({ countryA, countryB, mode, timelineYear, highlightedBloc, onHighlightBloc }: Props) {
   const a = ALL_COUNTRIES[countryA];
   const b = ALL_COUNTRIES[countryB];
 
@@ -94,9 +98,9 @@ export default function RelationshipDetail({ countryA, countryB, mode, timelineY
     : undefined;
   const activeColor = activeScore !== undefined ? getScoreColor(activeScore) : '#374151';
 
-  const blocsA = new Set(getBlocMemberships(countryA));
-  const blocsB = new Set(getBlocMemberships(countryB));
-  const sharedBlocs = [...blocsA].filter(x => blocsB.has(x));
+  const blocsA = getBlocMemberships(countryA);
+  const blocsBKeys = new Set(getBlocMemberships(countryB).map(b => b.key));
+  const sharedBlocs = blocsA.filter(b => blocsBKeys.has(b.key));
 
   const ma = getMetrics(countryA, wb);
   const mb = getMetrics(countryB, wb);
@@ -194,12 +198,24 @@ export default function RelationshipDetail({ countryA, countryB, mode, timelineY
         <div className="px-4 pt-3 pb-3 border-b" style={{ borderColor: '#1a2d44' }}>
           <h3 className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: '#60a5fa' }}>Shared Memberships</h3>
           <div className="flex flex-wrap gap-1.5">
-            {sharedBlocs.map(name => (
-              <span key={name} className="text-xs px-2 py-0.5 rounded font-medium"
-                style={{ background: 'rgba(37,99,235,0.18)', color: '#93c5fd', border: '1px solid rgba(96,165,250,0.25)' }}>
-                {name}
-              </span>
-            ))}
+            {sharedBlocs.map(b => {
+              const active = highlightedBloc === b.key;
+              return (
+                <button
+                  key={b.key}
+                  onClick={() => onHighlightBloc?.(b.key)}
+                  className="text-xs px-2 py-0.5 rounded font-medium transition-colors cursor-pointer"
+                  style={{
+                    background: active ? 'rgba(245,158,11,0.25)' : 'rgba(37,99,235,0.18)',
+                    color: active ? '#fbbf24' : '#93c5fd',
+                    border: `1px solid ${active ? 'rgba(245,158,11,0.6)' : 'rgba(96,165,250,0.25)'}`,
+                  }}
+                  title={`Highlight ${b.name} members on the map`}
+                >
+                  {b.name}
+                </button>
+              );
+            })}
           </div>
         </div>
       )}

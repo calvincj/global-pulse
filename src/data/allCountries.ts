@@ -169,6 +169,7 @@ export const ALL_COUNTRIES: Record<string, BasicCountry> = {
   TJK: { id: 'TJK', iso2: 'TJ', name: 'Tajikistan', capital: 'Dushanbe', population: 10000000, region: 'Asia', subregion: 'Central Asia' },
   THA: { id: 'THA', iso2: 'TH', name: 'Thailand', capital: 'Bangkok', population: 72000000, region: 'Asia', subregion: 'South-Eastern Asia' },
   TLS: { id: 'TLS', iso2: 'TL', name: 'Timor-Leste', capital: 'Dili', population: 1300000, region: 'Asia', subregion: 'South-Eastern Asia' },
+  TUR: { id: 'TUR', iso2: 'TR', name: 'Türkiye', capital: 'Ankara', population: 85000000, region: 'Asia', subregion: 'Western Asia' },
   TKM: { id: 'TKM', iso2: 'TM', name: 'Turkmenistan', capital: 'Ashgabat', population: 6100000, region: 'Asia', subregion: 'Central Asia' },
   ARE: { id: 'ARE', iso2: 'AE', name: 'United Arab Emirates', capital: 'Abu Dhabi', population: 9900000, region: 'Asia', subregion: 'Western Asia' },
   UZB: { id: 'UZB', iso2: 'UZ', name: 'Uzbekistan', capital: 'Tashkent', population: 36000000, region: 'Asia', subregion: 'Central Asia' },

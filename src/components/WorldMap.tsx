@@ -3,10 +3,11 @@ import * as d3 from 'd3';
 import * as topojson from 'topojson-client';
 import type { Topology, GeometryCollection } from 'topojson-specification';
 import { ALL_COUNTRIES } from '../data/allCountries';
-import { COUNTRIES } from '../data/countries';
-import { getRelationshipsFor, getScoreColor, getScoreLabel } from '../data/relationships';
+import { getRelationshipsFor, getScoreColor, getScoreLabel, BLOCS } from '../data/relationships';
 import { DISPUTED_TERRITORIES } from '../data/disputedTerritories';
 import { getHistoricalRelationship, interpolateSnapshot } from '../data/historicalRelationships';
+import { CONFLICT_ZONES } from '../data/conflicts';
+import { RELIGIONS, RELIGION_META, RELIGION_ORDER, getReligionFillRef, getMixedPatternDefs, religionLines, type ReligionCategory } from '../data/religions';
 import type { MapTooltip, MapMode } from '../types';
 
 interface Props {
@@ -17,6 +18,10 @@ interface Props {
   mode: MapMode;
   isMobile?: boolean;
   onTimelineYearChange?: (year: number | null) => void;
+  highlightBloc?: string | null;
+  onClearHighlightBloc?: () => void;
+  selectedConflict?: string | null;
+  onSelectConflict?: (id: string | null) => void;
 }
 
 // Complete ISO numeric → alpha-3 for every feature in world-atlas 50m
@@ -67,15 +72,30 @@ const DIM   = '#0c1a28';
 const TL_MIN = 2000;
 const TL_MAX = 2025;
 
-export default function WorldMap({ selectedCountry, secondaryCountry, onSelectCountry, onHoverCountry, mode, isMobile, onTimelineYearChange }: Props) {
+export default function WorldMap({ selectedCountry, secondaryCountry, onSelectCountry, onHoverCountry, mode, isMobile, onTimelineYearChange, highlightBloc, onClearHighlightBloc, selectedConflict, onSelectConflict }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRef        = useRef<SVGSVGElement>(null);
   const gRef          = useRef<SVGGElement | null>(null);
+  const conflictGroupRef = useRef<SVGGElement | null>(null);
   const lastHoverRef  = useRef<string | null>(null);
   const transformRef  = useRef<d3.ZoomTransform>(d3.zoomIdentity);
   const [tooltip, setTooltip]   = useState<MapTooltip | null>(null);
   const [topoData, setTopoData] = useState<Topology | null>(null);
   const [dims, setDims]         = useState<{ w: number; h: number } | null>(null);
+  const [showConflicts, setShowConflicts] = useState(true);
+  const [religionView, setReligionView]     = useState(false);
+  const [religionFilter, setReligionFilter] = useState<ReligionCategory | null>(null);
+  const religionViewRef   = useRef(religionView);
+  const religionFilterRef = useRef(religionFilter);
+  useEffect(() => { religionViewRef.current = religionView; }, [religionView]);
+  useEffect(() => { religionFilterRef.current = religionFilter; }, [religionFilter]);
+
+  // Refs mirroring props/state read inside event handlers bound once at map-rebuild time,
+  // so those handlers always see the latest value instead of the value at bind time.
+  const selectedCountryRef  = useRef(selectedCountry);
+  const selectedConflictRef = useRef(selectedConflict ?? null);
+  useEffect(() => { selectedCountryRef.current = selectedCountry; }, [selectedCountry]);
+  useEffect(() => { selectedConflictRef.current = selectedConflict ?? null; }, [selectedConflict]);
 
   // Timeline state — lives here since controls are in the map
   const [tlYear, setTlYear]       = useState(TL_MAX);
@@ -157,8 +177,32 @@ export default function WorldMap({ selectedCountry, secondaryCountry, onSelectCo
 
   const alpha3 = useCallback((num: number) => N2A[num] ?? null, []);
 
+  const religionNote = useCallback((id: string | null): string | undefined => {
+    if (!id) return undefined;
+    const info = RELIGIONS[id];
+    if (!info) return undefined;
+    const lines = religionLines(info.breakdown);
+    return info.mixed ? ['No single majority', ...lines].join('\n') : lines.join('\n');
+  }, []);
+
   const getFill = useCallback((id: string | null): string => {
     if (!id) return BASE;
+    if (religionView) {
+      const fillRef = getReligionFillRef(id);
+      if (!fillRef) return DIM;
+      if (religionFilter) {
+        const info = RELIGIONS[id];
+        const matches = info?.majority === religionFilter || info?.secondary === religionFilter;
+        return matches ? fillRef : DIM;
+      }
+      return fillRef;
+    }
+    if (highlightBloc) {
+      const bloc = BLOCS[highlightBloc];
+      const inBloc = bloc?.members.has(id);
+      if (id === selectedCountry) return inBloc ? '#facc15' : '#3b82f6';
+      return inBloc ? '#f59e0b' : DIM;
+    }
     if (id === selectedCountry) return '#3b82f6';
     if (id === secondaryCountry) return '#7c3aed';
     if (selectedCountry) {
@@ -171,7 +215,7 @@ export default function WorldMap({ selectedCountry, secondaryCountry, onSelectCo
             return getScoreColor(mode === 'political' ? snap.polScore : snap.ecoScore);
           }
         }
-        // No historical data for this pair — fall through to current score
+        // No historical data for this pair; fall through to current score
       }
       const rels = getRelationshipsFor(selectedCountry);
       const rel  = rels.find(r => r.source === id || r.target === id);
@@ -180,8 +224,8 @@ export default function WorldMap({ selectedCountry, secondaryCountry, onSelectCo
       }
       return DIM;
     }
-    return COUNTRIES[id] ? '#1e4878' : BASE;
-  }, [selectedCountry, secondaryCountry, mode, tlYear]);
+    return BASE;
+  }, [selectedCountry, secondaryCountry, mode, tlYear, highlightBloc, religionView, religionFilter]);
 
   // Rebuild map whenever topo data OR container dims change
   useEffect(() => {
@@ -194,6 +238,17 @@ export default function WorldMap({ selectedCountry, secondaryCountry, onSelectCo
     const path = d3.geoPath().projection(proj);
 
     svg.append('rect').attr('width', W).attr('height', H).attr('fill', OCEAN);
+
+    const defs = svg.append('defs');
+    for (const p of getMixedPatternDefs()) {
+      const pattern = defs.append('pattern')
+        .attr('id', p.id)
+        .attr('width', 7).attr('height', 7)
+        .attr('patternUnits', 'userSpaceOnUse')
+        .attr('patternTransform', 'rotate(45)');
+      pattern.append('rect').attr('width', 7).attr('height', 7).attr('fill', p.colorA);
+      pattern.append('rect').attr('width', 3.5).attr('height', 7).attr('fill', p.colorB);
+    }
 
     const g = svg.append('g');
     gRef.current = g.node();
@@ -230,10 +285,15 @@ export default function WorldMap({ selectedCountry, secondaryCountry, onSelectCo
         const a3 = alpha3(+d.id!);
         const c  = a3 ? ALL_COUNTRIES[a3] : null;
         if (!c) return;
-        const rels = selectedCountry
-          ? getRelationshipsFor(selectedCountry).find(r => r.source === a3 || r.target === a3)
-          : null;
-        setTooltip({ x: event.clientX, y: event.clientY, name: c.name, polScore: rels?.polScore, ecoScore: rels?.ecoScore });
+        if (religionViewRef.current) {
+          setTooltip({ x: event.clientX, y: event.clientY, name: c.name, note: religionNote(a3) });
+        } else {
+          const sel = selectedCountryRef.current;
+          const rels = sel
+            ? getRelationshipsFor(sel).find(r => r.source === a3 || r.target === a3)
+            : null;
+          setTooltip({ x: event.clientX, y: event.clientY, name: c.name, polScore: rels?.polScore, ecoScore: rels?.ecoScore });
+        }
         if (lastHoverRef.current !== a3) {
           lastHoverRef.current = a3;
           onHoverCountry?.(a3);
@@ -249,7 +309,7 @@ export default function WorldMap({ selectedCountry, secondaryCountry, onSelectCo
         event.stopPropagation();
         const a3 = alpha3(+d.id!);
         if (!a3 || !ALL_COUNTRIES[a3]) return;
-        onSelectCountry(a3 === selectedCountry ? null : a3);
+        onSelectCountry(a3 === selectedCountryRef.current ? null : a3);
       });
 
     g.append('path')
@@ -281,10 +341,15 @@ export default function WorldMap({ selectedCountry, secondaryCountry, onSelectCo
         .on('mousemove', (event) => {
           if (isMobile) return;
           const c = ALL_COUNTRIES[dt.id];
-          const rels = selectedCountry
-            ? getRelationshipsFor(selectedCountry).find(r => r.source === dt.id || r.target === dt.id)
-            : null;
-          setTooltip({ x: event.clientX, y: event.clientY, name: c.name, polScore: rels?.polScore, ecoScore: rels?.ecoScore });
+          if (religionViewRef.current) {
+            setTooltip({ x: event.clientX, y: event.clientY, name: c.name, note: religionNote(dt.id) });
+          } else {
+            const sel = selectedCountryRef.current;
+            const rels = sel
+              ? getRelationshipsFor(sel).find(r => r.source === dt.id || r.target === dt.id)
+              : null;
+            setTooltip({ x: event.clientX, y: event.clientY, name: c.name, polScore: rels?.polScore, ecoScore: rels?.ecoScore });
+          }
           if (lastHoverRef.current !== dt.id) {
             lastHoverRef.current = dt.id;
             onHoverCountry?.(dt.id);
@@ -298,7 +363,76 @@ export default function WorldMap({ selectedCountry, secondaryCountry, onSelectCo
         })
         .on('click', (event) => {
           event.stopPropagation();
-          onSelectCountry(dt.id === selectedCountry ? null : dt.id);
+          onSelectCountry(dt.id === selectedCountryRef.current ? null : dt.id);
+        });
+    }
+
+    // Ongoing conflict zones
+    const conflictG = g.append('g').attr('class', 'conflict-zones').style('display', showConflicts ? '' : 'none');
+    conflictGroupRef.current = conflictG.node();
+
+    for (const cz of CONFLICT_ZONES) {
+      const [lat, lon] = cz.coordinates;
+      const pt = proj([lon, lat]);
+      if (!pt) continue;
+      const [x, y] = pt;
+      const color = cz.type === 'war' ? '#ef4444' : cz.type === 'insurgency' ? '#f97316' : cz.type === 'proxy' ? '#eab308' : '#fb923c';
+      const outerR = 4 + cz.intensity * 7;
+      const innerR = 1.5 + cz.intensity * 2;
+      const outerOpacity = 0.10 + cz.intensity * 0.16;
+      const innerOpacity = 0.35 + cz.intensity * 0.45;
+      const pulse = cz.intensity >= 0.55;
+      const dur = `${(2.4 - cz.intensity).toFixed(2)}s`;
+
+      const czg = conflictG.append('g').attr('class', 'conflict-marker').attr('data-conflict-id', cz.id);
+
+      const outer = czg.append('circle')
+        .attr('cx', x).attr('cy', y).attr('r', outerR)
+        .attr('fill', color).attr('opacity', outerOpacity)
+        .style('pointer-events', 'none');
+
+      const inner = czg.append('circle')
+        .attr('cx', x).attr('cy', y).attr('r', innerR)
+        .attr('fill', color).attr('opacity', innerOpacity)
+        .attr('stroke', color).attr('stroke-width', 1)
+        .style('vector-effect', 'non-scaling-stroke')
+        .style('pointer-events', 'none');
+
+      if (pulse) {
+        inner.append('animate').attr('attributeName', 'r')
+          .attr('values', `${innerR};${innerR * 1.4};${innerR}`).attr('dur', dur).attr('repeatCount', 'indefinite');
+        outer.append('animate').attr('attributeName', 'opacity')
+          .attr('values', `${outerOpacity};${outerOpacity * 1.7};${outerOpacity}`).attr('dur', dur).attr('repeatCount', 'indefinite');
+      }
+
+      // Selection ring — hidden by default, toggled by the selectedConflict effect below
+      czg.append('circle')
+        .attr('class', 'conflict-select-ring')
+        .attr('cx', x).attr('cy', y).attr('r', innerR + 3.5)
+        .attr('fill', 'none')
+        .attr('stroke', '#ffffff')
+        .attr('stroke-width', 1.5)
+        .attr('opacity', cz.id === selectedConflictRef.current ? 1 : 0)
+        .style('vector-effect', 'non-scaling-stroke')
+        .style('pointer-events', 'none');
+
+      // Small, precise hit-area tight around the inner circle — kept close to the dot itself
+      // so overlapping conflicts (e.g. Israel-Gaza vs Israel-Hezbollah) stay independently clickable.
+      czg.append('circle')
+        .attr('cx', x).attr('cy', y).attr('r', Math.max(innerR + 2.5, 6))
+        .attr('fill', 'transparent')
+        .style('cursor', 'pointer')
+        .on('mousemove', (event) => {
+          if (isMobile) return;
+          setTooltip({ x: event.clientX, y: event.clientY, name: cz.name, note: cz.description });
+        })
+        .on('mouseleave', () => {
+          if (isMobile) return;
+          setTooltip(null);
+        })
+        .on('click', (event) => {
+          event.stopPropagation();
+          onSelectConflict?.(cz.id === selectedConflictRef.current ? null : cz.id);
         });
     }
 
@@ -310,7 +444,7 @@ export default function WorldMap({ selectedCountry, secondaryCountry, onSelectCo
       });
     svg.call(zoom);
     svg.call(zoom.transform, transformRef.current);
-    svg.on('click.deselect', () => { onSelectCountry(null); });
+    svg.on('click.deselect', () => { onSelectCountry(null); onSelectConflict?.(null); });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [topoData, dims]);
 
@@ -329,6 +463,24 @@ export default function WorldMap({ selectedCountry, secondaryCountry, onSelectCo
         .attr('class', `cp country-path${dt.id === selectedCountry ? ' selected' : ''}`);
     }
   }, [selectedCountry, secondaryCountry, mode, getFill, alpha3]);
+
+  // Toggle conflict-zone visibility without a full rebuild
+  useEffect(() => {
+    if (!conflictGroupRef.current) return;
+    d3.select(conflictGroupRef.current).style('display', showConflicts ? '' : 'none');
+  }, [showConflicts]);
+
+  // Toggle the selection ring on the selected conflict marker without a full rebuild
+  useEffect(() => {
+    if (!conflictGroupRef.current) return;
+    d3.select(conflictGroupRef.current)
+      .selectAll<SVGGElement, unknown>('g.conflict-marker')
+      .each(function () {
+        const marker = d3.select(this);
+        const isSelected = marker.attr('data-conflict-id') === selectedConflict;
+        marker.select('circle.conflict-select-ring').attr('opacity', isSelected ? 1 : 0);
+      });
+  }, [selectedConflict]);
 
   const activeScore = tooltip
     ? (mode === 'political' ? tooltip.polScore : tooltip.ecoScore)
@@ -352,6 +504,9 @@ export default function WorldMap({ selectedCountry, secondaryCountry, onSelectCo
           style={{ left: tooltip.x + 14, top: tooltip.y - 44, background: 'rgba(6,9,20,0.95)', border: '1px solid #1e3a5f' }}
         >
           <div className="font-semibold text-xs text-white" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>{tooltip.name}</div>
+          {tooltip.note && (
+            <div className="text-xs mt-1 leading-relaxed" style={{ color: '#94a3b8', maxWidth: 220, whiteSpace: 'pre-line' }}>{tooltip.note}</div>
+          )}
           {activeScore !== undefined && (
             <div className="flex items-center gap-1.5 mt-1">
               <div className="text-xs" style={{ color: '#64748b', fontFamily: "'Space Mono', monospace" }}>{mode === 'political' ? 'Pol' : 'Eco'}:</div>
@@ -373,14 +528,56 @@ export default function WorldMap({ selectedCountry, secondaryCountry, onSelectCo
         </div>
       )}
 
-      {/* Historical mode badge */}
-      {isHistoricalMode && (
-        <div className="absolute top-3 left-1/2 -translate-x-1/2 rounded-full px-3 py-1 text-xs pointer-events-none z-10 flex items-center gap-2"
-          style={{ background: 'rgba(6,9,20,0.9)', border: '1px solid rgba(96,165,250,0.35)', color: '#60a5fa', whiteSpace: 'nowrap', fontFamily: "'Space Mono', monospace" }}>
-          <span style={{ color: '#3b82f6' }}>◉</span>
-          Historical view — {tlYear}
-        </div>
-      )}
+      {/* Top badges: historical mode + bloc highlight */}
+      <div className="absolute top-3 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-10">
+        {isHistoricalMode && (
+          <div className="rounded-full px-3 py-1 text-xs pointer-events-none flex items-center gap-2"
+            style={{ background: 'rgba(6,9,20,0.9)', border: '1px solid rgba(96,165,250,0.35)', color: '#60a5fa', whiteSpace: 'nowrap', fontFamily: "'Space Mono', monospace" }}>
+            <span style={{ color: '#3b82f6' }}>◉</span>
+            Historical view: {tlYear}
+          </div>
+        )}
+        {highlightBloc && BLOCS[highlightBloc] && (
+          <div className="rounded-full pl-3 pr-1.5 py-1 text-xs pointer-events-auto flex items-center gap-2"
+            style={{ background: 'rgba(6,9,20,0.9)', border: '1px solid rgba(245,158,11,0.4)', color: '#fbbf24', whiteSpace: 'nowrap' }}>
+            <span>{BLOCS[highlightBloc].name} · {BLOCS[highlightBloc].members.size} members</span>
+            <button
+              onClick={onClearHighlightBloc}
+              className="rounded-full flex items-center justify-center"
+              style={{ width: 16, height: 16, background: 'rgba(245,158,11,0.2)', color: '#fbbf24' }}
+              title="Clear highlight"
+            >✕</button>
+          </div>
+        )}
+      </div>
+
+      {/* Religion + Conflicts toggles */}
+      <div className="absolute top-3 right-3 flex items-center gap-2 z-10">
+        <button
+          onClick={() => setReligionView(v => !v)}
+          className="rounded-full px-2.5 py-1 text-xs flex items-center gap-1.5"
+          style={{
+            background: religionView ? 'rgba(168,85,247,0.15)' : 'rgba(6,9,20,0.9)',
+            border: `1px solid ${religionView ? 'rgba(168,85,247,0.4)' : '#1e3a5f'}`,
+            color: religionView ? '#d8b4fe' : '#475569',
+          }}
+          title={religionView ? 'Hide religion view' : 'Show majority religion by country'}
+        >
+          <span>☪</span> Religion
+        </button>
+        <button
+          onClick={() => setShowConflicts(v => !v)}
+          className="rounded-full px-2.5 py-1 text-xs flex items-center gap-1.5"
+          style={{
+            background: showConflicts ? 'rgba(239,68,68,0.15)' : 'rgba(6,9,20,0.9)',
+            border: `1px solid ${showConflicts ? 'rgba(239,68,68,0.35)' : '#1e3a5f'}`,
+            color: showConflicts ? '#f87171' : '#475569',
+          }}
+          title={showConflicts ? 'Hide conflict zones' : 'Show conflict zones'}
+        >
+          <span>⚔</span> Conflicts ({CONFLICT_ZONES.length})
+        </button>
+      </div>
 
       {/* Mobile tap hint */}
       {isMobile && selectedCountry && !secondaryCountry && !isHistoricalMode && (
@@ -393,8 +590,56 @@ export default function WorldMap({ selectedCountry, secondaryCountry, onSelectCo
       {/* Bottom overlay: legend + timeline controls */}
       <div className="absolute bottom-4 left-4 right-4 flex items-end gap-3 pointer-events-none">
         {/* Legend */}
-        <div className="rounded-lg px-3 py-2.5 flex-shrink-0 pointer-events-auto" style={{ background: 'rgba(4,8,18,0.88)', border: '1px solid #162030', minWidth: 140 }}>
-          {selectedCountry ? (
+        <div className="rounded-lg px-3 py-2.5 flex-shrink-0 pointer-events-auto" style={{ background: 'rgba(4,8,18,0.88)', border: '1px solid #162030', minWidth: religionView ? 310 : 140 }}>
+          {religionView ? (
+            <>
+              <div className="flex items-center justify-between mb-2">
+                <div className="text-xs font-semibold uppercase tracking-wide" style={{ color: '#475569', fontFamily: "'Space Grotesk', sans-serif" }}>
+                  Majority Religion
+                </div>
+                {religionFilter && (
+                  <button onClick={() => setReligionFilter(null)} className="text-xs" style={{ color: '#a855f7' }} title="Clear filter">Clear ✕</button>
+                )}
+              </div>
+              <div className="grid grid-cols-2 gap-x-3 gap-y-1">
+                {RELIGION_ORDER.map(cat => {
+                  const meta = RELIGION_META[cat];
+                  const active = religionFilter === cat;
+                  return (
+                    <button
+                      key={cat}
+                      onClick={() => setReligionFilter(prev => prev === cat ? null : cat)}
+                      className="flex items-center gap-1.5 text-xs rounded px-1 py-0.5 -mx-1 transition-colors"
+                      style={{ background: active ? 'rgba(168,85,247,0.18)' : 'transparent' }}
+                      title={`Show only ${meta.label}-majority countries`}
+                    >
+                      <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: meta.color, opacity: religionFilter && !active ? 0.35 : 1 }} />
+                      <span className="truncate" style={{ color: active ? '#fff' : '#cbd5e1' }}>{meta.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+              <div className="flex items-center gap-1.5 text-xs mt-2 pt-2" style={{ color: '#4b5563', borderTop: '1px solid #162030' }}>
+                <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: 'repeating-linear-gradient(45deg, #a855f7 0, #a855f7 2px, #84cc16 2px, #84cc16 4px)' }} />
+                <span>Striped = no single majority</span>
+              </div>
+              <div className="text-xs mt-1" style={{ color: '#374151' }}>Click a religion to isolate it</div>
+            </>
+          ) : highlightBloc && BLOCS[highlightBloc] ? (
+            <>
+              <div className="text-xs font-semibold uppercase tracking-wide mb-2" style={{ color: '#475569', fontFamily: "'Space Grotesk', sans-serif" }}>
+                Bloc Highlight
+              </div>
+              <div className="flex items-center gap-1.5 text-xs mb-1">
+                <div className="w-2.5 h-2.5 rounded-full" style={{ background: '#f59e0b' }} />
+                <span style={{ color: '#cbd5e1' }}>{BLOCS[highlightBloc].name} member</span>
+              </div>
+              <div className="flex items-center gap-1.5 text-xs">
+                <div className="w-2.5 h-2.5 rounded-full" style={{ background: DIM }} />
+                <span style={{ color: '#4b5563' }}>Not a member</span>
+              </div>
+            </>
+          ) : selectedCountry ? (
             <>
               <div className="text-xs font-semibold uppercase tracking-wide mb-2" style={{ color: '#475569', fontFamily: "'Space Grotesk', sans-serif" }}>
                 {mode === 'political' ? 'Political Alignment' : 'Economic Integration'}

@@ -2,9 +2,11 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import WorldMap from './components/WorldMap';
 import CountryProfile from './components/CountryProfile';
 import RelationshipDetail from './components/RelationshipDetail';
+import ConflictDetail from './components/ConflictDetail';
 import SearchBar from './components/SearchBar';
 import IntroScreen from './components/IntroScreen';
 import { ALL_COUNTRIES, getFlag } from './data/allCountries';
+import { CONFLICT_ZONES } from './data/conflicts';
 import type { MapMode } from './types';
 import './index.css';
 
@@ -16,6 +18,8 @@ export default function App() {
   const [mode, setMode]                       = useState<MapMode>('political');
   const [sidebarWidth, setSidebarWidth]       = useState(320);
   const [timelineYear, setTimelineYear]       = useState<number | null>(null);
+  const [highlightedBloc, setHighlightedBloc] = useState<string | null>(null);
+  const [selectedConflict, setSelectedConflict] = useState<string | null>(null);
   const dragging   = useRef(false);
   const startX     = useRef(0);
   const startW     = useRef(0);
@@ -36,6 +40,8 @@ export default function App() {
   const showingRelationship = !!selectedCountry && !!activeHovered && activeHovered !== selectedCountry;
 
   const handleSelectCountry = useCallback((id: string | null) => {
+    setHighlightedBloc(null);
+    setSelectedConflict(null);
     if (isMobile && selectedCountry && id && id !== selectedCountry) {
       setSecondaryCountry(id === secondaryCountry ? null : id);
       return;
@@ -44,6 +50,19 @@ export default function App() {
     setSelectedCountry(id);
     if (!id) setTimelineYear(null); // reset timeline when deselecting
   }, [isMobile, selectedCountry, secondaryCountry]);
+
+  const handleHighlightBloc = useCallback((key: string) => {
+    setHighlightedBloc(prev => prev === key ? null : key);
+  }, []);
+
+  const handleSelectConflict = useCallback((id: string | null) => {
+    setSelectedConflict(id);
+    if (id) {
+      setSelectedCountry(null);
+      setSecondaryCountry(null);
+      setHighlightedBloc(null);
+    }
+  }, []);
 
   const onDragStart = useCallback((e: React.MouseEvent) => {
     dragging.current = true;
@@ -64,11 +83,15 @@ export default function App() {
     document.addEventListener('mouseup', onUp);
   }, [sidebarWidth]);
 
+  const conflictZone = selectedConflict ? CONFLICT_ZONES.find(c => c.id === selectedConflict) : null;
+
   const sidebarLabel = showingRelationship
     ? 'Bilateral Relationship'
-    : selectedCountry
-      ? (timelineYear != null ? `Historical · ${timelineYear}` : 'Country Profile')
-      : 'Select a Country';
+    : conflictZone
+      ? 'Conflict Zone'
+      : selectedCountry
+        ? (timelineYear != null ? `Historical · ${timelineYear}` : 'Country Profile')
+        : 'Select a Country';
 
   return (
     <>
@@ -81,7 +104,11 @@ export default function App() {
           style={{ borderBottom: '1px solid #1e3a5f', background: 'rgba(6,9,20,0.97)' }}
         >
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowIntro(true)}
+              className="flex items-center gap-2 cursor-pointer"
+              title="Back to intro"
+            >
               <div
                 className="w-6 h-6 rounded flex items-center justify-center text-xs font-bold text-white"
                 style={{ background: '#2563eb' }}
@@ -89,7 +116,7 @@ export default function App() {
               <span className="font-semibold text-white text-sm tracking-tight" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
                 Global Pulse
               </span>
-            </div>
+            </button>
 
             {/* Mode toggle */}
             <div className="flex items-center rounded-md overflow-hidden" style={{ border: '1px solid #1e3a5f' }}>
@@ -148,6 +175,10 @@ export default function App() {
               mode={mode}
               isMobile={isMobile}
               onTimelineYearChange={setTimelineYear}
+              highlightBloc={highlightedBloc}
+              onClearHighlightBloc={() => setHighlightedBloc(null)}
+              selectedConflict={selectedConflict}
+              onSelectConflict={handleSelectConflict}
             />
           </div>
 
@@ -182,12 +213,22 @@ export default function App() {
                   countryB={activeHovered!}
                   mode={mode}
                   timelineYear={timelineYear}
+                  highlightedBloc={highlightedBloc}
+                  onHighlightBloc={handleHighlightBloc}
+                />
+              ) : conflictZone ? (
+                <ConflictDetail
+                  conflictId={conflictZone.id}
+                  onSelectCountry={handleSelectCountry}
+                  onClose={() => setSelectedConflict(null)}
                 />
               ) : selectedCountry ? (
                 <CountryProfile
                   countryId={selectedCountry}
                   mode={mode}
                   timelineYear={timelineYear}
+                  highlightedBloc={highlightedBloc}
+                  onHighlightBloc={handleHighlightBloc}
                 />
               ) : (
                 <div className="flex flex-col items-center justify-center h-full text-center px-6">

@@ -230,7 +230,7 @@ export const COUNTRIES: Record<string, CountryData> = {
     description: 'Africa\'s most populous nation and largest economy, a cultural powerhouse with Nollywood and Afrobeats.',
   },
   TUR: {
-    id: 'TUR', iso2: 'TR', name: 'Turkey', capital: 'Ankara',
+    id: 'TUR', iso2: 'TR', name: 'Türkiye', capital: 'Ankara',
     population: 85000000, area: 783356, gdp: 1108, gdpPerCapita: 13109,
     region: 'Asia', subregion: 'Western Asia',
     languages: ['Turkish'], religions: ['Islam (Sunni)'],
@@ -305,7 +305,7 @@ export const COUNTRIES: Record<string, CountryData> = {
     coordinates: [32, 53], majorCities: ['Tehran', 'Mashhad', 'Isfahan', 'Karaj', 'Tabriz'],
     currency: 'Iranian Rial (IRR)', founded: '1979',
     history: 'The 1979 Islamic Revolution overthrew the Shah and established the Islamic Republic under Ayatollah Khomeini. The Iran-Iraq War (1980-88) killed hundreds of thousands. Iran developed a nuclear program that triggered sweeping US and UN sanctions. Iran joined the SCO and BRICS in 2024, deepening ties with Russia and China. In April 2024, Iran launched its first direct missile attack on Israel.',
-    description: 'A Shia Islamic theocracy and regional power, deeply constrained by US sanctions. Operates an expansive network of proxy forces — Hezbollah (Lebanon), Houthis (Yemen), PMF (Iraq) — as its primary strategic tool against Israel and US influence.',
+    description: 'A Shia Islamic theocracy and regional power, deeply constrained by US sanctions. Operates an expansive network of proxy forces, including Hezbollah (Lebanon), Houthis (Yemen), and PMF (Iraq), as its primary strategic tool against Israel and US influence.',
   },
   UKR: {
     id: 'UKR', iso2: 'UA', name: 'Ukraine', capital: 'Kyiv',
@@ -335,7 +335,7 @@ export const COUNTRIES: Record<string, CountryData> = {
     coordinates: [52, 20], majorCities: ['Warsaw', 'Kraków', 'Łódź', 'Wrocław', 'Poznań'],
     currency: 'Polish Złoty (PLN)', founded: '966',
     history: 'One of Europe\'s oldest states, partitioned three times in the 18th century, devastated in WWII (6M dead), liberated from Soviet control in 1989. Joined NATO (1999) and EU (2004). Since 2022 has become NATO\'s most important frontline state.',
-    description: 'NATO\'s most hawkish member, spending 4% of GDP on defense — highest in the alliance. Building Europe\'s largest army. A major economic success story — Poland\'s GDP has quadrupled since 1990.',
+    description: 'NATO\'s most hawkish member, spending 4% of GDP on defense, the highest in the alliance. Building Europe\'s largest army. A major economic success story: Poland\'s GDP has quadrupled since 1990.',
   },
   ISR: {
     id: 'ISR', iso2: 'IL', name: 'Israel', capital: 'Jerusalem',
@@ -380,7 +380,7 @@ export const COUNTRIES: Record<string, CountryData> = {
     militaryBudget: 19, hdi: 0.916, flag: '🇹🇼',
     coordinates: [23.5, 121], majorCities: ['New Taipei', 'Kaohsiung', 'Taichung', 'Tainan', 'Taipei'],
     currency: 'New Taiwan Dollar (TWD)', founded: '1912',
-    history: 'The Republic of China was founded in 1912. After the Communist victory in the Chinese Civil War, the ROC government under Chiang Kai-shek retreated to Taiwan in 1949. Taiwan democratized under Lee Teng-hui in the 1990s. TSMC (founded 1987) grew into the world\'s most critical semiconductor company. Taiwan\'s geopolitical status remains disputed — China claims it as a province; Taiwan operates as a de facto independent state.',
+    history: 'The Republic of China was founded in 1912. After the Communist victory in the Chinese Civil War, the ROC government under Chiang Kai-shek retreated to Taiwan in 1949. Taiwan democratized under Lee Teng-hui in the 1990s. TSMC (founded 1987) grew into the world\'s most critical semiconductor company. Taiwan\'s geopolitical status remains disputed: China claims it as a province, while Taiwan operates as a de facto independent state.',
     description: 'A self-governed island that produces 90%+ of the world\'s most advanced semiconductors. TSMC\'s fabs are considered so strategically critical that the US, Japan, and EU are paying billions to duplicate them domestically. China claims Taiwan as its territory and has never renounced the use of force to reunify.',
   },
   PRK: {

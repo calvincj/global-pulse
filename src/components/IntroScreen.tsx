@@ -57,7 +57,7 @@ export default function IntroScreen({ onEnter }: Props) {
         {/* Description */}
         <p className="text-base leading-relaxed mb-10 max-w-lg" style={{ color: '#64748b', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 400 }}>
           A geopolitics tracker I put together to map out how every country on Earth actually relates to each other.
-          Political alliances, economic ties, rivalries — click any country and see who they're aligned with,
+          Political alliances, economic ties, rivalries: click any country and see who they're aligned with,
           who they're beefing with, and why. Data runs through 2025 because things keep changing.
         </p>
 

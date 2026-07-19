@@ -6,10 +6,15 @@ import { getWorldBankData, getWorldBankForYear, type WBCountryData } from '../da
 import { getGdeltTone, type GdeltTone } from '../data/gdelt';
 import { getComtradeBilateral, hasComtradeKey, fmtTrade, type ComtradeFlow } from '../data/comtrade';
 import { getHistoricalRelationship, interpolateSnapshot } from '../data/historicalRelationships';
+import { RELIGIONS, RELIGION_META, religionLines } from '../data/religions';
 import ScoreBar from './ScoreBar';
 import type { MapMode } from '../types';
 
-interface Props { countryId: string; mode: MapMode; timelineYear?: number | null }
+interface Props {
+  countryId: string; mode: MapMode; timelineYear?: number | null;
+  highlightedBloc?: string | null;
+  onHighlightBloc?: (key: string) => void;
+}
 
 const fmt$ = (n: number) =>
   n >= 1e12 ? `$${(n/1e12).toFixed(2)}T`
@@ -36,7 +41,7 @@ const Tag = ({ text, bg, color, border }: { text: string; bg: string; color: str
 );
 
 
-export default function CountryProfile({ countryId, mode, timelineYear }: Props) {
+export default function CountryProfile({ countryId, mode, timelineYear, highlightedBloc, onHighlightBloc }: Props) {
   const [wb, setWb] = useState<WBCountryData | null>(null);
   const [wbLoading, setWbLoading] = useState(true);
   const [historicalWb, setHistoricalWb] = useState<WBCountryData | null>(null);
@@ -104,6 +109,7 @@ export default function CountryProfile({ countryId, mode, timelineYear }: Props)
     .sort((a, b) => (mode === 'political' ? b.polScore - a.polScore : b.ecoScore - a.ecoScore));
   const blocRels = relationships.filter(r => r.isBloc);
   const blocs = getBlocMemberships(countryId);
+  const religionInfo = RELIGIONS[countryId];
 
   return (
     <div className="h-full overflow-y-auto scrollbar-thin text-sm fade-in">
@@ -129,20 +135,26 @@ export default function CountryProfile({ countryId, mode, timelineYear }: Props)
       {blocs.length > 0 && (
         <div className="px-4 pt-3 pb-3 border-b" style={{ borderColor: '#1a2d44' }}>
           <h3 className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: '#60a5fa' }}>Alliances & Blocs</h3>
+          <div className="text-xs mb-2" style={{ color: '#374151' }}>Click a tag to highlight its members on the map</div>
           <div className="flex flex-wrap gap-1.5">
             {blocs.map(b => {
-              const isPolitical = ['NATO','Five Eyes','AUKUS','Quad','CSTO','G7'].includes(b);
-              const isEconomic  = ['European Union','MERCOSUR','GCC','ASEAN','Arab League','African Union'].includes(b);
-              const isBoth      = ['BRICS+','SCO','G7'].includes(b);
-              const bg    = isPolitical ? 'rgba(37,99,235,0.18)' : isEconomic ? 'rgba(5,150,105,0.15)' : 'rgba(100,116,139,0.15)';
-              const color = isPolitical ? '#93c5fd' : isEconomic ? '#6ee7b7' : '#94a3b8';
-              const bdr   = isPolitical ? 'rgba(96,165,250,0.25)' : isEconomic ? 'rgba(52,211,153,0.2)' : 'rgba(148,163,184,0.15)';
+              const isPolitical = ['NATO','Five Eyes','AUKUS','Quad','CSTO','G7','Visegrad Group','ALBA'].includes(b.name);
+              const isEconomic  = ['European Union','MERCOSUR','GCC','ASEAN','Arab League','African Union','SADC','ECOWAS','Pacific Alliance','CPTPP'].includes(b.name);
+              const active = highlightedBloc === b.key;
+              const bg    = active ? 'rgba(245,158,11,0.25)' : isPolitical ? 'rgba(37,99,235,0.18)' : isEconomic ? 'rgba(5,150,105,0.15)' : 'rgba(100,116,139,0.15)';
+              const color = active ? '#fbbf24' : isPolitical ? '#93c5fd' : isEconomic ? '#6ee7b7' : '#94a3b8';
+              const bdr   = active ? 'rgba(245,158,11,0.6)' : isPolitical ? 'rgba(96,165,250,0.25)' : isEconomic ? 'rgba(52,211,153,0.2)' : 'rgba(148,163,184,0.15)';
               return (
-                <span key={b} className="text-xs px-2 py-0.5 rounded font-medium" style={{ background: bg, color, border: `1px solid ${bdr}` }}>
-                  {b}
-                </span>
+                <button
+                  key={b.key}
+                  onClick={() => onHighlightBloc?.(b.key)}
+                  className="text-xs px-2 py-0.5 rounded font-medium transition-colors cursor-pointer"
+                  style={{ background: bg, color, border: `1px solid ${bdr}` }}
+                  title={`Highlight ${b.name} members on the map`}
+                >
+                  {b.name}
+                </button>
               );
-              void isBoth;
             })}
           </div>
         </div>
@@ -215,17 +227,39 @@ export default function CountryProfile({ countryId, mode, timelineYear }: Props)
       )}
 
       {/* People */}
-      {detailed && (
+      {(detailed || religionInfo) && (
         <div className="px-4 pt-3 pb-3 border-b" style={{ borderColor: '#1a2d44' }}>
           <h3 className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: '#60a5fa' }}>People</h3>
-          <div className="mb-2">
-            <div className="text-xs mb-1" style={{ color: '#4b5563' }}>Languages</div>
-            <div className="flex flex-wrap gap-1">{detailed.languages.map(l => <Tag key={l} text={l} bg="rgba(88,28,135,0.3)" color="#d8b4fe" border="rgba(167,139,250,0.15)" />)}</div>
-          </div>
-          <div>
-            <div className="text-xs mb-1" style={{ color: '#4b5563' }}>Religions</div>
-            <div className="flex flex-wrap gap-1">{detailed.religions.map(r => <Tag key={r} text={r} bg="rgba(120,53,15,0.35)" color="#fcd34d" border="rgba(251,191,36,0.15)" />)}</div>
-          </div>
+          {detailed && (
+            <div className="mb-2">
+              <div className="text-xs mb-1" style={{ color: '#4b5563' }}>Languages</div>
+              <div className="flex flex-wrap gap-1">{detailed.languages.map(l => <Tag key={l} text={l} bg="rgba(88,28,135,0.3)" color="#d8b4fe" border="rgba(167,139,250,0.15)" />)}</div>
+            </div>
+          )}
+          {religionInfo && (
+            <div>
+              <div className="text-xs mb-1" style={{ color: '#4b5563' }}>Religion</div>
+              <div className="flex items-center gap-1.5 mb-1">
+                <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: RELIGION_META[religionInfo.majority].color }} />
+                <span className="text-xs font-medium" style={{ color: '#e2e8f0' }}>
+                  {RELIGION_META[religionInfo.majority].label} {religionInfo.mixed ? 'plurality' : 'majority'} ({religionInfo.majorityPct}%)
+                </span>
+                {religionInfo.mixed && religionInfo.secondary && (
+                  <>
+                    <span style={{ color: '#374151' }}>+</span>
+                    <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: RELIGION_META[religionInfo.secondary].color }} />
+                    <span className="text-xs font-medium" style={{ color: '#e2e8f0' }}>{RELIGION_META[religionInfo.secondary].label}</span>
+                  </>
+                )}
+              </div>
+              {religionInfo.mixed && (
+                <div className="text-xs mb-1" style={{ color: '#a855f7' }}>No single religious majority</div>
+              )}
+              <div className="text-xs leading-relaxed" style={{ color: '#94a3b8' }}>
+                {religionLines(religionInfo.breakdown).map((line, i) => <div key={i}>{line}</div>)}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -265,7 +299,7 @@ export default function CountryProfile({ countryId, mode, timelineYear }: Props)
               if (!other) return null;
               const color = getScoreColor(rel.score);
               return (
-                <div key={otherId} title={`${other.name} — ${getScoreLabel(rel.score)}`}
+                <div key={otherId} title={`${other.name}: ${getScoreLabel(rel.score)}`}
                   className="flex items-center gap-1 text-xs rounded px-1.5 py-0.5"
                   style={{ background: 'rgba(30,74,127,0.18)', border: `1px solid ${color}33` }}>
                   <span>{getFlag(other.iso2)}</span>
