@@ -6,7 +6,7 @@ import { ALL_COUNTRIES } from '../data/allCountries';
 import { getRelationshipsFor, getScoreColor, getScoreLabel, BLOCS } from '../data/relationships';
 import { DISPUTED_TERRITORIES } from '../data/disputedTerritories';
 import { getHistoricalRelationship, interpolateSnapshot } from '../data/historicalRelationships';
-import { CONFLICT_ZONES } from '../data/conflicts';
+import { CONFLICT_ZONES, isConflictActiveInYear } from '../data/conflicts';
 import { RELIGIONS, RELIGION_META, RELIGION_ORDER, getReligionFillRef, getMixedPatternDefs, religionLines, type ReligionCategory } from '../data/religions';
 import type { MapTooltip, MapMode } from '../types';
 
@@ -470,6 +470,19 @@ export default function WorldMap({ selectedCountry, secondaryCountry, onSelectCo
     d3.select(conflictGroupRef.current).style('display', showConflicts ? '' : 'none');
   }, [showConflicts]);
 
+  // Show only conflicts active in the selected timeline year — scrubbing back reveals
+  // historic (ended) wars like Iraq/Afghanistan/Syria and hides ones that hadn't started yet.
+  useEffect(() => {
+    if (!conflictGroupRef.current) return;
+    d3.select(conflictGroupRef.current)
+      .selectAll<SVGGElement, unknown>('g.conflict-marker')
+      .each(function () {
+        const marker = d3.select(this);
+        const cz = CONFLICT_ZONES.find(c => c.id === marker.attr('data-conflict-id'));
+        marker.style('display', cz && isConflictActiveInYear(cz, tlYear) ? '' : 'none');
+      });
+  }, [tlYear]);
+
   // Toggle the selection ring on the selected conflict marker without a full rebuild
   useEffect(() => {
     if (!conflictGroupRef.current) return;
@@ -573,9 +586,9 @@ export default function WorldMap({ selectedCountry, secondaryCountry, onSelectCo
             border: `1px solid ${showConflicts ? 'rgba(239,68,68,0.35)' : '#1e3a5f'}`,
             color: showConflicts ? '#f87171' : '#475569',
           }}
-          title={showConflicts ? 'Hide conflict zones' : 'Show conflict zones'}
+          title={showConflicts ? `Hide conflict zones (${isHistoricalMode ? `active in ${tlYear}` : 'currently active'})` : 'Show conflict zones'}
         >
-          <span>⚔</span> Conflicts ({CONFLICT_ZONES.length})
+          <span>⚔</span> Conflicts ({CONFLICT_ZONES.filter(cz => isConflictActiveInYear(cz, tlYear)).length})
         </button>
       </div>
 

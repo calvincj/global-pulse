@@ -20,23 +20,39 @@ export default function ConflictDetail({ conflictId, onSelectCountry, onClose }:
 
   const typeMeta = TYPE_META[cz.type];
   const countries = cz.countries.map(id => ALL_COUNTRIES[id]).filter(Boolean);
+  const isEnded = cz.endYear != null;
+  const dateRange = isEnded
+    ? (cz.startYear === cz.endYear ? `${cz.startYear}` : `${cz.startYear}–${cz.endYear}`)
+    : `${cz.startYear}–present`;
 
   return (
     <div className="h-full overflow-y-auto scrollbar-thin text-sm fade-in">
       {/* Header */}
       <div className="p-4 border-b" style={{ borderColor: '#1a2d44' }}>
         <div className="flex items-start justify-between gap-2 mb-2">
-          <span
-            className="text-xs px-2 py-0.5 rounded font-medium uppercase tracking-wide"
-            style={{ background: `${typeMeta.color}22`, color: typeMeta.color, border: `1px solid ${typeMeta.color}44` }}
-          >
-            ⚔ {typeMeta.label}
-          </span>
+          <div className="flex items-center gap-1.5">
+            <span
+              className="text-xs px-2 py-0.5 rounded font-medium uppercase tracking-wide"
+              style={{ background: `${typeMeta.color}22`, color: typeMeta.color, border: `1px solid ${typeMeta.color}44` }}
+            >
+              ⚔ {typeMeta.label}
+            </span>
+            {isEnded && (
+              <span
+                className="text-xs px-2 py-0.5 rounded font-medium uppercase tracking-wide"
+                style={{ background: 'rgba(100,116,139,0.15)', color: '#94a3b8', border: '1px solid rgba(100,116,139,0.3)' }}
+                title="This conflict has ended; it only appears when the map's timeline year falls within its date range"
+              >
+                Historic
+              </span>
+            )}
+          </div>
           {onClose && (
             <button onClick={onClose} className="text-xs flex-shrink-0" style={{ color: '#475569' }} title="Close">✕</button>
           )}
         </div>
         <h2 className="text-base font-bold text-white leading-tight">{cz.name}</h2>
+        <div className="text-xs mt-1 font-mono" style={{ color: '#60a5fa' }}>{dateRange}</div>
       </div>
 
       {/* Intensity */}

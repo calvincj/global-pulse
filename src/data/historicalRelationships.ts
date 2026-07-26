@@ -57,7 +57,8 @@ export const HISTORICAL_RELATIONSHIPS: HistoricalRelationship[] = [
       { year: 2018, polScore: -0.55, ecoScore:  0.48, note: "Trade war begins: 25% tariffs on $250B Chinese goods; Huawei blacklisted." },
       { year: 2020, polScore: -0.65, ecoScore:  0.40, note: "COVID origins dispute; Hong Kong NSL; TikTok/WeChat ban attempts; Phase 1 deal." },
       { year: 2022, polScore: -0.70, ecoScore:  0.42, note: "Pelosi Taiwan visit triggers Chinese military exercises; CHIPS Act decoupling." },
-      { year: 2024, polScore: -0.72, ecoScore:  0.45, note: "145% tariffs; TSMC export controls; South China Sea incidents; still largest trade pair." },
+      { year: 2024, polScore: -0.72, ecoScore:  0.42, note: "Biden raises Section 301 tariffs on Chinese EVs (100%), solar cells, steel, semiconductors (May); export controls tighten; still largest bilateral trade pair." },
+      { year: 2025, polScore: -0.68, ecoScore:  0.38, note: "Trump tariffs spiral to 145% US / 125% China (Apr) before a Geneva truce cuts them to ~30%/10% (May); rare-earth export curbs; Xi-Trump Busan meeting (Oct) extends the truce and resumes soybean/rare-earth flows." },
     ],
   },
 
@@ -73,7 +74,8 @@ export const HISTORICAL_RELATIONSHIPS: HistoricalRelationship[] = [
       { year: 2016, polScore: -0.60, ecoScore: -0.32, note: "Election interference attribution; Obama expels 35 Russian diplomats (Dec)." },
       { year: 2018, polScore: -0.70, ecoScore: -0.40, note: "Salisbury Novichok attack; CAATSA sanctions; INF treaty collapse." },
       { year: 2022, polScore: -0.92, ecoScore: -0.85, note: "Full-scale Ukraine invasion; SWIFT exclusion; $300B assets frozen; 60 diplomats expelled." },
-      { year: 2024, polScore: -0.95, ecoScore: -0.88, note: "No direct contact; nuclear threats; F-16s to Ukraine; Trump-Putin back-channel 2025." },
+      { year: 2024, polScore: -0.95, ecoScore: -0.88, note: "No direct contact; nuclear threats; F-16s to Ukraine." },
+      { year: 2025, polScore: -0.75, ecoScore: -0.80, note: "Trump-Putin Anchorage summit (Aug) reopens direct contact and revives peace-plan talks over Ukraine; sanctions remain largely intact; no ceasefire reached." },
     ],
   },
 
@@ -87,7 +89,7 @@ export const HISTORICAL_RELATIONSHIPS: HistoricalRelationship[] = [
       { year: 2019, polScore:  0.58, ecoScore:  0.25, note: "Zelensky elected; Ukraine aid phone call triggers Trump first impeachment." },
       { year: 2022, polScore:  0.88, ecoScore:  0.22, note: "Full-scale invasion; Biden commits $100B+; HIMARS, artillery, Stingers delivered." },
       { year: 2024, polScore:  0.88, ecoScore:  0.22, note: "F-16s arrive; ATACMS delivered; US election uncertainty over continued support." },
-      { year: 2025, polScore:  0.70, ecoScore:  0.25, note: "Trump pauses some aid; Mar-a-Lago critical minerals deal; pressure for ceasefire." },
+      { year: 2025, polScore:  0.65, ecoScore:  0.25, note: "Feb Oval Office clash with Trump/Vance briefly halts aid; critical-minerals deal signed in Washington (Apr); sustained US pressure for a ceasefire deal." },
     ],
   },
 
@@ -101,6 +103,7 @@ export const HISTORICAL_RELATIONSHIPS: HistoricalRelationship[] = [
       { year: 2019, polScore:  0.72, ecoScore:  0.52, note: "Joint naval exercises; Huawei 5G expanding into Russian market." },
       { year: 2022, polScore:  0.80, ecoScore:  0.62, note: "No-limits partnership declaration (Feb 4); China buys discounted Russian oil post-invasion." },
       { year: 2024, polScore:  0.80, ecoScore:  0.65, note: "Trade hits $240B; China provides dual-use goods; cautious to avoid secondary sanctions." },
+      { year: 2025, polScore:  0.82, ecoScore:  0.68, note: "Putin attends China's Sept 3 WWII victory parade alongside Kim Jong Un — first joint Xi-Putin-Kim public appearance; trade tops $240B; China absorbs more sanctioned Russian energy and metals." },
     ],
   },
 
@@ -166,7 +169,8 @@ export const HISTORICAL_RELATIONSHIPS: HistoricalRelationship[] = [
       { year: 2018, polScore: -0.72, ecoScore: -0.55, note: "Yemen war proxy conflict deepens; Houthi missile attacks on Riyadh." },
       { year: 2021, polScore: -0.65, ecoScore: -0.52, note: "Secret talks in Baghdad begin; JCPOA US re-entry discussions." },
       { year: 2023, polScore: -0.45, ecoScore: -0.45, note: "China-brokered normalization (March); ambassadors returned; fragile re-engagement." },
-      { year: 2024, polScore: -0.50, ecoScore: -0.48, note: "Gaza war strains re-engagement; Houthi Yemen attacks; cautious diplomacy continues." },
+      { year: 2024, polScore: -0.50, ecoScore: -0.48, note: "Gaza war and Houthi attacks on shipping raise regional temperature, but Riyadh and Tehran keep direct engagement intact; no rupture." },
+      { year: 2025, polScore: -0.42, ecoScore: -0.42, note: "Ties hold through the Israel-Iran War (Jun); Pezeshkian-MBS contacts continue; Saudi declines to join any anti-Iran coalition; cautious normalization deepens." },
     ],
   },
 
@@ -175,11 +179,12 @@ export const HISTORICAL_RELATIONSHIPS: HistoricalRelationship[] = [
     pair: ['IRN', 'USA'],
     snapshots: [
       { year: 2002, polScore: -0.75, ecoScore: -0.88, note: "Axis of Evil speech; nuclear program disclosed; sanctions tighten." },
-      { year: 2007, polScore: -0.80, ecoScore: -0.90, note: "IRGC designated terrorist; unilateral sanctions plus UNSC resolutions." },
+      { year: 2007, polScore: -0.80, ecoScore: -0.90, note: "IRGC-Quds Force designated for terrorism support, and the wider IRGC for WMD proliferation (Oct); UNSC Resolution 1747 sanctions. (Full IRGC-as-FTO designation doesn't come until 2019.)" },
       { year: 2015, polScore: -0.55, ecoScore: -0.65, note: "JCPOA signed; Iran agrees to nuclear limits; sanctions relief; historic thaw." },
       { year: 2018, polScore: -0.85, ecoScore: -0.92, note: "Trump withdraws from JCPOA; maximum pressure campaign; IRGC Quds re-designated." },
       { year: 2020, polScore: -0.92, ecoScore: -0.94, note: "Soleimani assassination (Jan); Iran hits US bases in Iraq; nuclear limits abandoned." },
-      { year: 2024, polScore: -0.97, ecoScore: -0.95, note: "Iran launches 300 missiles+drones at Israel (April); US active defense; no JCPOA." },
+      { year: 2024, polScore: -0.97, ecoScore: -0.95, note: "Iran fires ~300 missiles/drones at Israel (Apr) and a second barrage (Oct), both defended in part by US forces; no JCPOA." },
+      { year: 2025, polScore: -1.00, ecoScore: -0.98, note: "12-Day War (Jun): Israel's opening strikes kill IRGC leadership and nuclear scientists; US bombs Fordow, Natanz and Isfahan (Operation Midnight Hammer, Jun 22); Iran's token retaliation on Al Udeid, Qatar is mostly intercepted; ceasefire ends the direct war." },
     ],
   },
 
@@ -231,7 +236,8 @@ export const HISTORICAL_RELATIONSHIPS: HistoricalRelationship[] = [
       { year: 2014, polScore: -0.80, ecoScore: -0.68, note: "Operation Protective Edge: 50-day war; 2,200 Palestinian deaths." },
       { year: 2020, polScore: -0.72, ecoScore: -0.58, note: "Abraham Accords (UAE, Bahrain) without Palestinian input; PA outraged." },
       { year: 2023, polScore: -0.95, ecoScore: -0.72, note: "Oct 7 Hamas massacre (1,200 killed); Israeli ground operation; 2M+ displaced." },
-      { year: 2024, polScore: -0.95, ecoScore: -0.75, note: "Gaza war continues; ICJ genocide case; Rafah operation; partial ceasefire Nov." },
+      { year: 2024, polScore: -0.95, ecoScore: -0.75, note: "Gaza war continues all year; ICJ genocide case (Jan); Rafah offensive (May); famine conditions in parts of Gaza; no truce reached (the Nov ceasefire that year was Israel-Hezbollah in Lebanon, not Gaza)." },
+      { year: 2025, polScore: -0.80, ecoScore: -0.62, note: "Phase-one ceasefire and hostage-for-prisoner exchange begins (Jan 19); collapses as Israel resumes major strikes (Mar 18); Trump's 20-point plan produces a broader ceasefire and release of remaining living hostages (Oct)." },
     ],
   },
 
@@ -259,6 +265,7 @@ export const HISTORICAL_RELATIONSHIPS: HistoricalRelationship[] = [
       { year: 2016, polScore: -0.72, ecoScore:  0.50, note: "Tsai Ing-wen elected; China suspends official contacts; military pressure resumes." },
       { year: 2022, polScore: -0.88, ecoScore:  0.50, note: "Pelosi visit triggers largest Chinese military exercises since 1996 crisis; encirclement drills." },
       { year: 2024, polScore: -0.95, ecoScore:  0.52, note: "Lai Ching-te (independence-leaning) elected; China conducts Joint Sword-2024 exercises." },
+      { year: 2025, polScore: -0.95, ecoScore:  0.55, note: "China holds Strait Thunder-2025A drills (Apr) simulating a blockade; Taiwan pushes defense spending past 3% of GDP; Lai's hardening rhetoric on China angers Beijing." },
     ],
   },
 
@@ -272,6 +279,7 @@ export const HISTORICAL_RELATIONSHIPS: HistoricalRelationship[] = [
       { year: 2021, polScore:  0.30, ecoScore:  0.50, note: "Biden labels Saudi pariah; releases Khashoggi report; arms sales paused (Yemen)." },
       { year: 2022, polScore:  0.40, ecoScore:  0.54, note: "Biden fist-bump visit (July); OPEC+ production cut (Oct) infuriates Washington." },
       { year: 2024, polScore:  0.50, ecoScore:  0.58, note: "US-Saudi defense treaty negotiations; Saudi-Israel normalization stalled by Gaza." },
+      { year: 2025, polScore:  0.58, ecoScore:  0.65, note: "Trump's first state visit of his second term is to Riyadh (May); Saudi pledges $600B+ in US investment; mutual-defense talks continue, but Saudi-Israel normalization stays conditioned on a Palestinian-statehood pathway." },
     ],
   },
 
@@ -287,6 +295,75 @@ export const HISTORICAL_RELATIONSHIPS: HistoricalRelationship[] = [
       { year: 2019, polScore: -0.68, ecoScore: -0.35, note: "Zelensky elected; prisoner exchange; Minsk process stalled." },
       { year: 2022, polScore: -1.00, ecoScore: -0.95, note: "Full-scale invasion (Feb 24); Mariupol siege; Bucha; total economic severance." },
       { year: 2024, polScore: -1.00, ecoScore: -0.95, note: "War of attrition; Kursk incursion; F-16s delivered; no peace talks." },
+      { year: 2025, polScore: -1.00, ecoScore: -0.95, note: "War of attrition continues; Istanbul talks yield prisoner swaps but no ceasefire; Russia grinds forward in Donbas; Trump pushes a US-brokered peace framework late in the year." },
+    ],
+  },
+
+  // ── ISRAEL ↔ IRAN ──────────────────────────────────────────────────────────
+  {
+    pair: ['IRN', 'ISR'],
+    snapshots: [
+      { year: 2000, polScore: -0.55, ecoScore: -0.30, note: "No relations since 1979; Iran backs Hezbollah in South Lebanon; rivalry stays largely covert." },
+      { year: 2005, polScore: -0.65, ecoScore: -0.35, note: "Ahmadinejad's 'wipe off the map' rhetoric; Iran's nuclear program becomes Israel's top-line security threat." },
+      { year: 2010, polScore: -0.75, ecoScore: -0.40, note: "Stuxnet cyberattack cripples Natanz centrifuges (attributed to Israel/US); assassinations of Iranian nuclear scientists begin." },
+      { year: 2015, polScore: -0.68, ecoScore: -0.35, note: "Netanyahu campaigns against the JCPOA before US Congress, calling it an existential threat to Israel." },
+      { year: 2020, polScore: -0.80, ecoScore: -0.45, note: "Israel assassinates nuclear scientist Mohsen Fakhrizadeh (Nov); shadow war of sabotage and covert strikes intensifies." },
+      { year: 2024, polScore: -0.95, ecoScore: -0.60, note: "First direct state-on-state exchange: Israel strikes Iran's consulate in Damascus (Apr); Iran fires ~300 missiles/drones at Israel, Israel retaliates near Isfahan; a second Iranian barrage follows in Oct." },
+      { year: 2025, polScore: -1.00, ecoScore: -0.70, note: "12-Day War (Jun): Israel's Operation Rising Lion kills IRGC commanders and nuclear scientists; Iran fires ballistic missiles at Israeli cities; US strikes Iran's nuclear sites; ceasefire ends open war but the shadow conflict continues." },
+    ],
+  },
+
+  // ── ISRAEL ↔ SYRIA ─────────────────────────────────────────────────────────
+  {
+    pair: ['ISR', 'SYR'],
+    snapshots: [
+      { year: 2000, polScore: -0.55, ecoScore: -0.20, note: "No peace treaty since the 1973 war and 1974 disengagement; Hafez al-Assad dies (Jun), Bashar succeeds; Golan Heights occupation remains a frozen conflict." },
+      { year: 2007, polScore: -0.60, ecoScore: -0.20, note: "Israel bombs a suspected Syrian nuclear reactor at Deir ez-Zor (Operation Orchard, Sept)." },
+      { year: 2011, polScore: -0.45, ecoScore: -0.15, note: "Syrian civil war begins; Israel largely stays on the sidelines while monitoring chemical weapons and Iranian entrenchment near its border." },
+      { year: 2018, polScore: -0.55, ecoScore: -0.10, note: "Israel conducts hundreds of strikes on Iranian/Hezbollah positions inside Syria; Assad, propped up by Russia and Iran, survives the war." },
+      { year: 2024, polScore: -0.60, ecoScore: -0.05, note: "Assad regime collapses (Dec 8) as an HTS-led offensive takes Damascus; within days Israel destroys Syria's military stockpiles and seizes the UN buffer zone on Mt. Hermon." },
+      { year: 2025, polScore: -0.30, ecoScore:  0.05, note: "Israel strikes Syrian government forces near Druze communities in Suwayda (Jul) and around Damascus; quiet security contacts with al-Sharaa's government begin even as Israeli troops remain in the buffer zone." },
+    ],
+  },
+
+  // ── SAUDI ARABIA ↔ YEMEN ───────────────────────────────────────────────────
+  {
+    pair: ['SAU', 'YEM'],
+    snapshots: [
+      { year: 2000, polScore:  0.10, ecoScore:  0.10, note: "Saudi-Yemen border treaty signed (Jun), ending a decades-old dispute; wary but stable relationship." },
+      { year: 2009, polScore: -0.30, ecoScore: -0.05, note: "Saudi forces intervene directly against Houthi rebels in the Sa'dah war (Operation Scorched Earth)." },
+      { year: 2015, polScore: -0.65, ecoScore: -0.30, note: "Saudi-led coalition intervenes (Mar) after Houthis oust the government and seize Sanaa; war begins." },
+      { year: 2019, polScore: -0.55, ecoScore: -0.35, note: "Houthi drone/missile strikes hit the Abqaiq-Khurais Aramco facilities (Sept), briefly halving Saudi oil output." },
+      { year: 2022, polScore: -0.35, ecoScore: -0.30, note: "UN-brokered truce (Apr) sharply reduces fighting; an unofficial ceasefire holds even after the formal truce lapses." },
+      { year: 2023, polScore: -0.15, ecoScore: -0.20, note: "Direct Saudi-Houthi talks in Sanaa produce a roadmap toward a formal peace deal; prisoner exchanges continue." },
+      { year: 2025, polScore: -0.20, ecoScore: -0.20, note: "A formal peace deal remains unsigned; Houthis direct their fire at Israel and Red Sea shipping instead of Saudi Arabia; fragile de facto truce holds." },
+    ],
+  },
+
+  // ── QATAR ↔ SAUDI ARABIA ────────────────────────────────────────────────────
+  {
+    pair: ['QAT', 'SAU'],
+    snapshots: [
+      { year: 2000, polScore:  0.30, ecoScore:  0.35, note: "GCC partners; simmering rivalry over Qatar's independent foreign policy and Al Jazeera's coverage of the region." },
+      { year: 2014, polScore: -0.10, ecoScore:  0.15, note: "Saudi, UAE and Bahrain recall their ambassadors from Doha (Mar) over Qatari support for the Muslim Brotherhood; resolved within months." },
+      { year: 2017, polScore: -0.70, ecoScore: -0.35, note: "Saudi Arabia, UAE, Bahrain and Egypt sever ties and blockade Qatar (Jun 5), closing the land border and airspace; Turkey and Iran airlift supplies to Doha." },
+      { year: 2020, polScore: -0.55, ecoScore: -0.30, note: "Blockade grinds on with no resolution; Qatar deepens ties with Turkey and Iran as alternative partners." },
+      { year: 2021, polScore:  0.15, ecoScore:  0.30, note: "Al-Ula Declaration (Jan) ends the blockade; borders and airspace reopen, though reconciliation stays cautious." },
+      { year: 2024, polScore:  0.30, ecoScore:  0.40, note: "Relations normalized; Qatar mediates Gaza ceasefire talks alongside Egypt and the US; GCC coordination restored." },
+    ],
+  },
+
+  // ── SYRIA ↔ TURKEY ──────────────────────────────────────────────────────────
+  {
+    pair: ['SYR', 'TUR'],
+    snapshots: [
+      { year: 2000, polScore: -0.20, ecoScore:  0.10, note: "Post-1998 Adana Agreement thaw after Syria expelled PKK leader Ocalan; tensions easing but water-sharing and border disputes linger." },
+      { year: 2004, polScore:  0.35, ecoScore:  0.30, note: "Erdogan-Assad rapprochement; Turkey lifts visa requirements and trade booms; touted as a model 'strategic partnership'." },
+      { year: 2011, polScore: -0.60, ecoScore: -0.30, note: "Erdogan turns on Assad as Syria's civil war erupts; Turkey arms and hosts the opposition; relations rupture completely." },
+      { year: 2016, polScore: -0.50, ecoScore: -0.10, note: "Turkey launches Operation Euphrates Shield into northern Syria, targeting ISIS and Kurdish YPG forces." },
+      { year: 2019, polScore: -0.55, ecoScore: -0.10, note: "Operation Peace Spring (Oct), after the US withdraws from northeast Syria; Turkey occupies a strip of the northern border region." },
+      { year: 2024, polScore: -0.20, ecoScore:  0.10, note: "Assad regime falls (Dec) to an HTS-led offensive out of Idlib, an area under heavy Turkish influence; Turkey emerges as the dominant foreign power broker in post-Assad Syria." },
+      { year: 2025, polScore:  0.55, ecoScore:  0.35, note: "Turkey opens full ties with al-Sharaa's government, helps train the new Syrian army, and pursues reconstruction contracts — its friendliest Damascus relationship in over a decade." },
     ],
   },
 ];
