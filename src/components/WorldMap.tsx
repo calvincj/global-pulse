@@ -99,6 +99,8 @@ export default function WorldMap({ selectedCountry, secondaryCountry, onSelectCo
 
   // Timeline state — lives here since controls are in the map
   const [tlYear, setTlYear]       = useState(TL_MAX);
+  const tlYearRef = useRef(tlYear); // read at marker-creation time so initial opacity is correct with no mount-fade
+  useEffect(() => { tlYearRef.current = tlYear; }, [tlYear]);
   const [tlPlaying, setTlPlaying] = useState(false);
   const tlRafRef    = useRef<number | null>(null);
   const tlStartRef  = useRef<number>(0);
@@ -385,6 +387,14 @@ export default function WorldMap({ selectedCountry, secondaryCountry, onSelectCo
       const dur = `${(2.4 - cz.intensity).toFixed(2)}s`;
 
       const czg = conflictG.append('g').attr('class', 'conflict-marker').attr('data-conflict-id', cz.id);
+      // Set initial appear/disappear state directly (no transition) so there's no mount-time flash;
+      // the [tlYear] effect below takes over with an animated transition on subsequent scrubs.
+      const activeAtMount = isConflictActiveInYear(cz, tlYearRef.current);
+      czg
+        .style('transform-origin', `${x}px ${y}px`)
+        .style('opacity', activeAtMount ? 1 : 0)
+        .style('transform', activeAtMount ? 'scale(1)' : 'scale(0.4)')
+        .style('pointer-events', activeAtMount ? '' : 'none');
 
       const outer = czg.append('circle')
         .attr('cx', x).attr('cy', y).attr('r', outerR)
@@ -472,6 +482,8 @@ export default function WorldMap({ selectedCountry, secondaryCountry, onSelectCo
 
   // Show only conflicts active in the selected timeline year — scrubbing back reveals
   // historic (ended) wars like Iraq/Afghanistan/Syria and hides ones that hadn't started yet.
+  // Animated (fade + pop) rather than an instant display toggle, so conflicts visibly
+  // appear/disappear as the timeline crosses their start/end year.
   useEffect(() => {
     if (!conflictGroupRef.current) return;
     d3.select(conflictGroupRef.current)
@@ -479,7 +491,14 @@ export default function WorldMap({ selectedCountry, secondaryCountry, onSelectCo
       .each(function () {
         const marker = d3.select(this);
         const cz = CONFLICT_ZONES.find(c => c.id === marker.attr('data-conflict-id'));
-        marker.style('display', cz && isConflictActiveInYear(cz, tlYear) ? '' : 'none');
+        const active = cz ? isConflictActiveInYear(cz, tlYear) : true;
+        marker.style('pointer-events', active ? '' : 'none');
+        marker.interrupt()
+          .transition()
+          .duration(420)
+          .ease(d3.easeCubicOut)
+          .style('opacity', active ? 1 : 0)
+          .style('transform', active ? 'scale(1)' : 'scale(0.4)');
       });
   }, [tlYear]);
 
@@ -677,61 +696,59 @@ export default function WorldMap({ selectedCountry, secondaryCountry, onSelectCo
           )}
         </div>
 
-        {/* Timeline controls — shown when a country is selected */}
-        {selectedCountry && (
-          <div className="rounded-lg px-3 py-2.5 flex-1 pointer-events-auto" style={{ background: 'rgba(4,8,18,0.88)', border: `1px solid ${isHistoricalMode ? 'rgba(96,165,250,0.3)' : '#162030'}`, maxWidth: 300 }}>
-            <div className="flex items-center gap-2 mb-1.5">
+        {/* Timeline controls — always available; drives conflict markers and, when a country is selected, its relationship colors */}
+        <div className="rounded-lg px-3 py-2.5 flex-1 pointer-events-auto" style={{ background: 'rgba(4,8,18,0.88)', border: `1px solid ${isHistoricalMode ? 'rgba(96,165,250,0.3)' : '#162030'}`, maxWidth: 300 }}>
+          <div className="flex items-center gap-2 mb-1.5">
+            <button
+              onClick={togglePlay}
+              className="text-xs px-2 py-0.5 rounded flex-shrink-0 transition-colors"
+              style={{
+                background: tlPlaying ? 'rgba(239,68,68,0.18)' : 'rgba(37,99,235,0.18)',
+                color: tlPlaying ? '#f87171' : '#93c5fd',
+                border: `1px solid ${tlPlaying ? 'rgba(239,68,68,0.3)' : 'rgba(96,165,250,0.25)'}`,
+              }}
+            >
+              {tlPlaying ? '■' : '▶'}
+            </button>
+            <span
+              className="text-sm font-bold flex-shrink-0"
+              style={{ color: isHistoricalMode ? '#60a5fa' : '#334155', fontFamily: "'Space Mono', monospace", minWidth: 38 }}
+            >
+              {isHistoricalMode ? tlYear : 'Live'}
+            </span>
+            {isHistoricalMode && (
               <button
-                onClick={togglePlay}
-                className="text-xs px-2 py-0.5 rounded flex-shrink-0 transition-colors"
-                style={{
-                  background: tlPlaying ? 'rgba(239,68,68,0.18)' : 'rgba(37,99,235,0.18)',
-                  color: tlPlaying ? '#f87171' : '#93c5fd',
-                  border: `1px solid ${tlPlaying ? 'rgba(239,68,68,0.3)' : 'rgba(96,165,250,0.25)'}`,
-                }}
+                onClick={resetToLive}
+                className="text-xs flex-shrink-0"
+                style={{ color: '#475569' }}
+                title="Return to current data"
               >
-                {tlPlaying ? '■' : '▶'}
+                ↺ Live
               </button>
-              <span
-                className="text-sm font-bold flex-shrink-0"
-                style={{ color: isHistoricalMode ? '#60a5fa' : '#334155', fontFamily: "'Space Mono', monospace", minWidth: 38 }}
-              >
-                {isHistoricalMode ? tlYear : 'Live'}
-              </span>
-              {isHistoricalMode && (
-                <button
-                  onClick={resetToLive}
-                  className="text-xs flex-shrink-0"
-                  style={{ color: '#475569' }}
-                  title="Return to current data"
-                >
-                  ↺ Live
-                </button>
-              )}
-            </div>
-            <input
-              type="range"
-              min={TL_MIN}
-              max={TL_MAX}
-              value={tlYear}
-              onChange={e => { stopPlay(); handleYearChange(+e.target.value); }}
-              className="w-full"
-              style={{ accentColor: '#3b82f6', cursor: 'pointer', height: 4 }}
-            />
-            <div className="flex justify-between mt-1" style={{ fontFamily: "'Space Mono', monospace" }}>
-              {[2000, 2005, 2010, 2015, 2020, 2025].map(y => (
-                <button
-                  key={y}
-                  onClick={() => { stopPlay(); handleYearChange(y); }}
-                  className="text-xs"
-                  style={{ color: tlYear === y ? '#60a5fa' : '#1e3a5f' }}
-                >
-                  {y === 2025 ? 'Now' : y}
-                </button>
-              ))}
-            </div>
+            )}
           </div>
-        )}
+          <input
+            type="range"
+            min={TL_MIN}
+            max={TL_MAX}
+            value={tlYear}
+            onChange={e => { stopPlay(); handleYearChange(+e.target.value); }}
+            className="w-full"
+            style={{ accentColor: '#3b82f6', cursor: 'pointer', height: 4 }}
+          />
+          <div className="flex justify-between mt-1" style={{ fontFamily: "'Space Mono', monospace" }}>
+            {[2000, 2005, 2010, 2015, 2020, 2025].map(y => (
+              <button
+                key={y}
+                onClick={() => { stopPlay(); handleYearChange(y); }}
+                className="text-xs"
+                style={{ color: tlYear === y ? '#60a5fa' : '#1e3a5f' }}
+              >
+                {y === 2025 ? 'Now' : y}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );

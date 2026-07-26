@@ -331,7 +331,7 @@ export const HISTORICAL_RELATIONSHIPS: HistoricalRelationship[] = [
     pair: ['SAU', 'YEM'],
     snapshots: [
       { year: 2000, polScore:  0.10, ecoScore:  0.10, note: "Saudi-Yemen border treaty signed (Jun), ending a decades-old dispute; wary but stable relationship." },
-      { year: 2009, polScore: -0.30, ecoScore: -0.05, note: "Saudi forces intervene directly against Houthi rebels in the Sa'dah war (Operation Scorched Earth)." },
+      { year: 2009, polScore: -0.30, ecoScore: -0.05, note: "Saudi forces intervene directly after a Houthi cross-border incursion during Yemen's own 'Operation Scorched Earth' offensive (Nov 2009) — Saudi Arabia's first military operation since the 1991 Gulf War." },
       { year: 2015, polScore: -0.65, ecoScore: -0.30, note: "Saudi-led coalition intervenes (Mar) after Houthis oust the government and seize Sanaa; war begins." },
       { year: 2019, polScore: -0.55, ecoScore: -0.35, note: "Houthi drone/missile strikes hit the Abqaiq-Khurais Aramco facilities (Sept), briefly halving Saudi oil output." },
       { year: 2022, polScore: -0.35, ecoScore: -0.30, note: "UN-brokered truce (Apr) sharply reduces fighting; an unofficial ceasefire holds even after the formal truce lapses." },
