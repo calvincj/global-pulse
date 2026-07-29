@@ -25,3 +25,7 @@ dist-ssr
 
 # Claude Code
 .claude
+
+# Raw critical-minerals research archive (200MB+ of intermediate CSVs/xlsx/pngs;
+# critmin/raw/ holds the small canonical sources actually used by scripts/build-critical-minerals-data.mjs)
+critmin/archive/

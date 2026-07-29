@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, lazy, Suspense } from 'react';
 import WorldMap from './components/WorldMap';
 import CountryProfile from './components/CountryProfile';
 import RelationshipDetail from './components/RelationshipDetail';
@@ -10,8 +10,12 @@ import { CONFLICT_ZONES } from './data/conflicts';
 import type { MapMode } from './types';
 import './index.css';
 
+const MineralsScreen = lazy(() => import('./components/MineralsScreen'));
+
+type Screen = 'intro' | 'political' | 'minerals';
+
 export default function App() {
-  const [showIntro, setShowIntro]           = useState(true);
+  const [screen, setScreen] = useState<Screen>('intro');
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
   const [secondaryCountry, setSecondaryCountry] = useState<string | null>(null);
   const [hoveredCountry, setHoveredCountry]   = useState<string | null>(null);
@@ -64,6 +68,15 @@ export default function App() {
     }
   }, []);
 
+  const goToMenu = useCallback(() => {
+    setSelectedCountry(null);
+    setSecondaryCountry(null);
+    setHighlightedBloc(null);
+    setSelectedConflict(null);
+    setTimelineYear(null);
+    setScreen('intro');
+  }, []);
+
   const onDragStart = useCallback((e: React.MouseEvent) => {
     dragging.current = true;
     startX.current   = e.clientX;
@@ -93,10 +106,20 @@ export default function App() {
         ? (timelineYear != null ? `Historical · ${timelineYear}` : 'Country Profile')
         : 'Select a Country';
 
+  if (screen === 'intro') {
+    return <IntroScreen onSelectScreen={s => setScreen(s)} />;
+  }
+
+  if (screen === 'minerals') {
+    return (
+      <Suspense fallback={<ScreenLoadingFallback />}>
+        <MineralsScreen isMobile={isMobile} onBackToMenu={goToMenu} />
+      </Suspense>
+    );
+  }
+
   return (
     <>
-      {showIntro && <IntroScreen onEnter={() => setShowIntro(false)} />}
-
       <div className="flex flex-col h-screen" style={{ background: '#060c14' }}>
         {/* Top bar */}
         <header
@@ -105,9 +128,9 @@ export default function App() {
         >
           <div className="flex items-center gap-4">
             <button
-              onClick={() => setShowIntro(true)}
+              onClick={goToMenu}
               className="flex items-center gap-2 cursor-pointer"
-              title="Back to intro"
+              title="Back to menu"
             >
               <div
                 className="w-6 h-6 rounded flex items-center justify-center text-xs font-bold text-white"
@@ -248,5 +271,13 @@ export default function App() {
         </div>
       </div>
     </>
+  );
+}
+
+function ScreenLoadingFallback() {
+  return (
+    <div className="flex items-center justify-center h-screen" style={{ background: '#060c14' }}>
+      <div style={{ color: '#60a5fa', fontFamily: "'Space Mono', monospace" }} className="text-sm">Loading…</div>
+    </div>
   );
 }
